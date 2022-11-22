@@ -3,7 +3,7 @@
 # 예제 - 음식배달
 
 ## 최종 결과모델
-![EDM](https://user-images.githubusercontent.com/118698671/203071747-fcf8b0a4-33a7-4cc4-adfc-34bbdc5c66e2.jpg)
+![EDM](https://user-images.githubusercontent.com/118698671/203226941-76c97b4a-4222-4015-a6ed-32f2b490a82e.jpg)
  - 고객이 메뉴를 선택하여 주문한다. (ok)
  - 고객이 선택한 메뉴에 대해 결제한다. (ok)
  - 주문이 되면 주문 내역이 입점상점주인에게 주문정보가 전달된다.  (ok)
