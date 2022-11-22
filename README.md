@@ -4,6 +4,7 @@
 
 ## 최종 결과모델
 ![EDM](https://user-images.githubusercontent.com/118698671/203226941-76c97b4a-4222-4015-a6ed-32f2b490a82e.jpg)
+
  - 고객이 메뉴를 선택하여 주문한다. (ok)
  - 고객이 선택한 메뉴에 대해 결제한다. (ok)
  - 주문이 되면 주문 내역이 입점상점주인에게 주문정보가 전달된다.  (ok)
@@ -15,13 +16,14 @@
  - 고객이 주문상태를 중간중간 조회한다. (ok)
  - 주문상태가 바뀔 때 마다 카톡으로 알림을 보낸다. (ok)
  - 고객이 요리를 배달 받으면 배송확인 버튼을 탭하여, 모든 거래가 완료된다. (ok)
- - 고객이 주문 후기를 등록한다. (ok)
- - 점주는 주문 후기를 조회한다. (ok)
+ - (추가 시나리오) 고객이 주문 후기를 등록한다. (ok)
+ - (추가 시나리오) 점주는 주문 후기를 조회한다. (ok)
 
 
 ## 구현 체크포인트
 1. Saga (Pub / Sub)
 ```
+// Pub : 결제 됨
 @PostPersist
 public void onPostPersist() {
     Paid paid = new Paid(this);
@@ -29,6 +31,7 @@ public void onPostPersist() {
     paid.publishAfterCommit();
 }
 
+// Sub : 주문을 전달받음
 @StreamListener(
     value = KafkaProcessor.INPUT,
     condition = "headers['type']=='Paid'"
@@ -41,6 +44,7 @@ public void wheneverPaid_SetOrder(@Payload Paid paid) {
 ```
 2. CQRS
 ```
+// 주문이 들어오면 주문리스트 대시보드(View) Repo에 INSERT 
 @StreamListener(KafkaProcessor.INPUT)
 public void whenOrderPlaced_then_CREATE_1(
     @Payload OrderPlaced orderPlaced
@@ -61,6 +65,7 @@ public void whenOrderPlaced_then_CREATE_1(
 ```
 3. Compensation / Correlation
 ```
+// 주문취소 보상처리
 @PreRemove
 public void onPreRemove() {
     OrderCanceled orderCanceled = new OrderCanceled(this);
@@ -70,12 +75,14 @@ public void onPreRemove() {
 ```
 4. Request / Response
 ```
+// Order BC-> Pay BC 향 결제 Request
 @FeignClient(name = "Pay", url = "${api.url.Pay}")
 public interface PayService {
     @RequestMapping(method = RequestMethod.POST, path = "/pays")
     public void pay(@RequestBody Pay pay);
 }
 
+// Pay BC 결제로직
 @PostPersist
 public void onPostPersist(){
     Paid paid = new Paid(this);
@@ -84,6 +91,7 @@ public void onPostPersist(){
 ```
 5. Circuit Breaker
 ```
+// OpenFeign Circuit Breaker 설정
 feign:
   hystrix:
     enabled: true
@@ -95,6 +103,7 @@ hystrix:
 ```
 6. Gateway
 ```
+// 라우팅 설정
 spring:
   cloud:
     gateway:
@@ -120,5 +129,3 @@ spring:
         predicates:
           - Path=/messagemanagement/**
 ```
-
-
