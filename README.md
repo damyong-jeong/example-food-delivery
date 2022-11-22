@@ -3,7 +3,7 @@
 # 예제 - 음식배달
 
 ## 최종 결과모델
-![EDM](https://user-images.githubusercontent.com/118698671/203226941-76c97b4a-4222-4015-a6ed-32f2b490a82e.jpg)
+![EDM](https://user-images.githubusercontent.com/118698671/203246198-cb262558-0989-4bcf-8bfe-d7599f3e48d1.jpg)
 
  - 고객이 메뉴를 선택하여 주문한다. (ok)
  - 고객이 선택한 메뉴에 대해 결제한다. (ok)
